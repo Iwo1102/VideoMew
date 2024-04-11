@@ -30,9 +30,10 @@ const GameSchema = new mongoose.Schema({
 	id: Number,
 	title: String,
   developer: String,
-  releaseDate: String,
+  releaseDate: Date,
 	image: String,
-  rating: [{UserId: Number, rating: Number}],
+  genre: [String],
+  reviews: [{userId: Number, rating: Number, comment: String}],
   avgRating: Number
 
 });
@@ -59,17 +60,17 @@ router.post('/signin', async (req, res, next) => {
           console.log(error.message);
     }
     if (!checkPass) {
-      res.send({ success: false, message: "Email or password incorrect" })
+      res.send({ success: false, message: "Email or password incorrect", error: 1 })
       return
     }
     req.session.isLoggedIn = true
     req.session.theLoggedInUser = theUser.userName
     if (theUser.admin == true) {
       req.session.isAdmin = true
-      res.send({ success: true, message: "Welcome, Admin" })
+      res.send({ success: true, message: "Welcome, Admin", error: 0 })
     } else {
       req.session.isAdmin = false
-      res.send({ success: true, message: "Welcome" })
+      res.send({ success: true, message: "Welcome", error: 0 })
     }
   })
   
@@ -94,12 +95,12 @@ router.post('/signin', async (req, res, next) => {
             console.log("ID: " + userId)
             userId++;
           }
-            res.send({ success: true, message: "Signup successfull" })
+            res.send({ success: true, message: "Signup successfull", error: 0 })
         } else {
-          res.send({ success: false, message: "User Name aready exists" })
+          res.send({ success: false, message: "User Name aready exists", error: 1 })
         }
       } else {
-        res.send({ success: false, message: "Email aready used" })
+        res.send({ success: false, message: "Email aready used", error: 2 })
       }
   
    } catch (error) {
@@ -114,6 +115,66 @@ router.post('/signin', async (req, res, next) => {
     req.session.isAdmin = false
     res.send('done: ' + loggedIn)
   })
+
+  router.get('/getAllGames', async (req, res, next) => {
+    try {
+      let games = await Game.find();
+      res.send(games)
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+      console.log(error.message);
+    }  
+  })
   
+  router.post('/reviewAdd', async (req, res, next) => {
+    if (req.session.isLoggedIn == true) {
+      try {
+        let userCaller = req.body.userName
+        let gameTitle = req.body.title
+        let gameRating = req.body.rating
+        let gameComment = req.body.comment
+
+
+        let user = await User.findOne({userName: {$eq: userCaller}});
+        if (user.length != 0) {
+          let game = await Game.findOne({title:{$eq: gameTitle}});
+          let errFlag = 0;
+          if (game.length != 0) {
+            for (let i = 0; i < game.reviews.length; i++) {
+              if (game.reviews[i].userId == user.id) {
+                errFlag = 1;
+              } 
+            }
+            console.log("review count " + game.reviews.length)
+            if (errFlag == 1) {
+              res.send({ success: false, message: "User already reviewed this game", error: 4 })
+            } else {
+              // reviews: [{UserId: Number, rating: Number, comment: String}]
+              let avg = 0;
+              for (let i = 0; i < game.reviews.length; i++) {
+                avg += game.reviews[i].rating;
+              }
+              avg += gameRating
+              avg = avg / (game.reviews.length + 1)
+              //console.log({message: "game reviews", game.})
+              await Game.findOneAndUpdate({title: {$eq: gameTitle}}, {$push: {reviews: {userId: user.id, rating: gameRating, comment: gameComment}}, avgRating: avg});
+              // reviews: [{gameId: Number, rating: Number}]
+              await User.findOneAndUpdate({userName: {$eq: userCaller}}, {$push: {reviews: {gameId: game.id, rating: gameRating}}});
+              res.send({ success: true, message: "Review Added", error: 0 })
+            }
+          } else {
+            res.send({ success: false, message: "Game not found", error: 3 })
+          }
+        } else {
+          res.send({ success: false, message: "User not found", error: 2 })
+        }
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+          console.log(error.message);
+      }
+    } else {
+      res.send({ success: false, message: "Not logged in", error: 1 })
+    }
+  })
 
   exports.routes = router
