@@ -8,12 +8,12 @@ import { View, Text } from 'react-native';
 import SearchScreen from './screens/SearchScreen';
 import ReviewScreen from './screens/ReviewScreen';
 import LibraryScreen from './screens/LibraryScreen';
-
-import SearchScreen from './screens/SearchScreen';
+import SigninScreen from './screens/SigninScreen';
 
 const searchName = 'Search';
 const reviewName = 'Reviews';
 const libraryName = 'Library';
+const signinName = 'Signin';
 
 const Tab = createBottomTabNavigator();
 
@@ -32,8 +32,9 @@ export default function MainContainer(){
                 iconName = focused ? 'newspaper' : 'newspaper-outline';
             } else if (rn === libraryName) {
                 iconName = focused ? 'library' : 'library-outline';
+            } else if (rn === signinName) {
+                iconName = focused ? 'person' : 'person-outline';
             }
-
            
             return <Ionicons name={iconName} size={size} color={color} />;
           },
@@ -50,6 +51,7 @@ export default function MainContainer(){
             <Tab.Screen name={searchName} component={SearchScreen} />
             <Tab.Screen name={reviewName} component={ReviewScreen} />
             <Tab.Screen name={libraryName} component={LibraryScreen} />
+            <Tab.Screen name={signinName} component={SigninScreen} />
             </Tab.Navigator>
    
     );
