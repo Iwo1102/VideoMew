@@ -1,30 +1,122 @@
 import * as React from 'react';
 import { useState } from 'react';
+import {NavigationContainer} from '@react-navigation/native';
 import {View, Text, Button, StyleSheet} from 'react-native';
 import CustomTextBox from '../components/textBox';
-import SigninHandler from '../webserver/fetchHandlers';
+import SigninHandler from '../webserver/SigninHandler';
+import SignupHandler from '../webserver/SignupHandler'
+import SignoutHander from '../webserver/SignoutHandler'
 
 export default function SigninScreen({navigation}) {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    return(
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <Text> SignIn </Text>
-            <CustomTextBox placeholder="username" onChangeText={text => setUsername(text)}/>
-            <CustomTextBox placeholder="password" onChangeText={text => setPassword(text)}/>
-            <Button title="Submit" onPress={SigninHandler(username, password)}/>
+    const [success, setSucess] = useState(true)
+    const [message, setMessage] = useState('')
+    const [screen, setScreen] = useState('')
+    const [email, setEmail] = useState('')
+    const [confPassword, setconfPassword] = useState('')
 
-            <View style={styles.container}>
-                <Text> Not Signed up? </Text>
-                <Button title="Sign up"/>
+    const signinPressed = async () => {
+        try {
+            const res = await SigninHandler(username, password);
+            console.log("response:" + res.success)
+            if (res.success) {
+                setSucess(true)
+                setScreen('signout')
+            } else {
+                setSucess(false)
+                setMessage(res.message)
+            }
+        } catch (error) {
+            console.error("Error during sign-in:", error.message);
+        }
+    };
+
+    const signupPressed = async () => {
+        if (password != confPassword) {
+            setSucess(false)
+            setMessage("Passwords don't match")
+        }
+        try {
+            const res = await SignupHandler(username, password, email);
+            console.log("response:" + res.success)
+            if (res.success) {
+                setSucess(true)
+                setScreen('signout')
+            } else {
+                setSucess(false)
+                setMessage(res.message)
+            }
+        } catch (error) {
+            console.error("Error during sign-in:", error.message);
+        }
+    };
+
+    const signoutPressed = async () => {
+        try {
+            const res = await SignoutHander(username, password);
+            console.log("response:" + res.success)
+                if (res.success) {
+                    setSucess(true)
+                    setScreen('signin')
+                    setPassword('')
+                    setUsername('')
+                } else {
+                    setSucess(false)
+                    setMessage(res.message)
+                }
+        } catch (error) {
+            console.error("Error during sign-in:", error.message);
+        }
+    };
+
+
+    return(
+        
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <View style={styles.container}> 
+                {screen != 'signout' && (
+                    <>
+                        <Text> Not Signed up? </Text>
+                        <Button title="Sign up" onPress={() => setScreen('signup')}/>
+                        <Text> Else </Text>
+                        <Button title="Sign in" onPress={() => setScreen('signin')}/>
+                    </>
+                )}
+                {screen == 'signout' && (
+                    <>
+                        <Button title="Sign out" onPress={signoutPressed}/>
+                    </>
+                )}
+                
             </View>
+            {screen == 'signin' && (
+                <>
+                    <Text> SignIn </Text>
+                    {!success && <Text style={{ color: 'red' }}>{message}</Text>}
+                    <CustomTextBox placeholder="Username" onChangeText={text => setUsername(text)} />
+                    <CustomTextBox placeholder="Password" onChangeText={text => setPassword(text)} />
+                    <Button title="Submit" onPress={signinPressed} />
+                </>
+            )}
+            {screen == 'signup' && (
+                <>
+                    <Text> SignUp </Text>
+                    {success == false && <Text style={{ color: 'red' }}>{message} </Text>}
+                    <CustomTextBox placeholder="Username" onChangeText={text => setUsername(text)}/>
+                    <CustomTextBox placeholder="Email" onChangeText={text => setEmail(text)}/>
+                    <CustomTextBox placeholder="Password" onChangeText={text => setPassword(text)}/>
+                    <CustomTextBox placeholder="Confirm Password" onChangeText={text => setconfPassword(text)}/>
+                    <Button title="Submit" onPress={signupPressed} />
+                </>
+            )}
             </View>
     );
-}
+} 
 
 const styles = StyleSheet.create({
     container: {
       padding: 20,
       margin: 10,
-    },
+    }
 });

@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-async function SigninHandler(userName, password) {
+async function SignoutHandler(userName, password,) {
     try {
-        let resp =  await fetch('http://54.81.45.41:3000/signin', {
+        let resp =  await fetch('http://54.81.45.41:3000/signout', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -12,11 +12,12 @@ async function SigninHandler(userName, password) {
                 pass: password
             })
         });
-        await resp.json()
+        const data = await resp.json()
+        return data
     } catch (error) {
         res.status(500).json({ error: error.message });
 		console.log(error.message);
     }
 }
 
-export default SigninHandler;
+export default SignoutHandler;
