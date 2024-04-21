@@ -19,13 +19,23 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName='mainContainer'>
-      <Stack.Screen
-        name="mainContainer"
-        component={mainContainer}
-        options={{headerShown: false}}
-      />
+        <Stack.Screen
+          name="mainContainer"
+          component={mainContainer}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="LibraryScreen"
+          component={LibraryScreen}
+          options={{ title: 'Library' }}  
+        />
+        <Stack.Screen
+          name="ReviewScreen"
+          component={ReviewScreen}
+          options={{ title: 'Review' }}  
+        />
       </Stack.Navigator>
-      </NavigationContainer>
+    </NavigationContainer>
   );
 }
 

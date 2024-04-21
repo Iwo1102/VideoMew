@@ -116,15 +116,17 @@ router.post('/signin', async (req, res, next) => {
     res.send('done: ' + loggedIn)
   })
 
-  router.get('/getAllGames', async (req, res, next) => {
+  router.get('/getAllGames', async (req, res) => {
     try {
-      let games = await Game.find();
-      res.send(games)
+        const games = await Game.find();  // Assuming 'Game' is your Mongoose model
+        res.json(games);  // Sends the games as JSON
+        console.log("Games fetched");
     } catch (error) {
-      res.status(500).json({ error: error.message });
-      console.log(error.message);
-    }  
-  })
+        res.status(500).json({ error: 'Internal Server Error' });
+        console.error("Error fetching games:", error);
+    }
+});
+
   
   router.post('/reviewAdd', async (req, res, next) => {
     if (req.session.isLoggedIn == true) {
