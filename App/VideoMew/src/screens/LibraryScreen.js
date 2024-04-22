@@ -6,25 +6,24 @@ export default function LibraryScreen({ navigation }) {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-        fetchGames();  
+      fetchGames();
     });
 
     return unsubscribe;
-}, [navigation]);
+  }, [navigation]);
 
   const fetchGames = async () => {
     try {
-        const response = await fetch('http://54.81.45.41:3000/getAllGames');  
-        const data = await response.json();
-        setGames(data);
+      const response = await fetch('http://54.81.45.41:3000/getAllGames');
+      const data = await response.json();
+      setGames(data);
     } catch (error) {
-        console.error('Failed to fetch games', error);
-        alert('Failed to fetch games: ' + error.message);
+      console.error('Failed to fetch games', error);
+      alert('Failed to fetch games: ' + error.message);
     }
-};
+  };
 
-
-return (
+  return (
     <ScrollView contentContainerStyle={styles.container}>
       {games.map(game => (
         <TouchableOpacity key={game.id} style={styles.gameContainer} onPress={() => navigation.navigate('ReviewScreen', { game })}>
@@ -32,6 +31,12 @@ return (
           <Image source={{ uri: game.image }} style={styles.image} />
           <Text>Developer: {game.developer}</Text>
           <Text>Genre: {game.genre.join(', ')}</Text>
+          {game.reviews && game.reviews.map((review, index) => (
+            <View key={index} style={styles.reviewText}>
+              <Text>Rating: {review.rating} Stars</Text>
+              <Text>Comment: {review.comment}</Text>
+            </View>
+          ))}
         </TouchableOpacity>
       ))}
     </ScrollView>
@@ -56,5 +61,10 @@ const styles = StyleSheet.create({
     width: 250,
     height: 250,
     resizeMode: 'cover'
+  },
+  reviewText: {
+    padding: 5,
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 });

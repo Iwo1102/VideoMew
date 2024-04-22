@@ -5,6 +5,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import mainContainer from './src/mainContainer';
+import LinearGradient from 'react-native-linear-gradient'; 
+
+
 
 import SearchScreen from './src/screens/SearchScreen';
 import ReviewScreen from './src/screens/ReviewScreen';

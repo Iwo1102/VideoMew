@@ -118,13 +118,23 @@ router.post('/signin', async (req, res, next) => {
 
   router.get('/getAllGames', async (req, res) => {
     try {
-        const games = await Game.find();  // Assuming 'Game' is your Mongoose model
-        res.json(games);  // Sends the games as JSON
-        console.log("Games fetched");
+        const games = await Game.find().populate('reviews'); // Assuming reviews are a subdocument or referenced document
+        res.json(games);
     } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
         console.error("Error fetching games:", error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
+});
+
+router.get('/searchGames', async (req, res) => {
+  try {
+      const query = req.query.q; // Assume "q" is the query parameter
+      const games = await Game.find({ title: { $regex: query, $options: 'i' }}).populate('reviews');
+      res.json(games);
+  } catch (error) {
+      console.error("Error searching games:", error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
   
