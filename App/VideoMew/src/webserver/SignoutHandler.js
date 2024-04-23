@@ -17,7 +17,7 @@ async function SignoutHandler(userName, password,) {
     } catch (error) {
         console.error("Error in SignoutHandler:", error.message);
 		console.log(error.message);
-        return error;
+        return data;
     }
 }
 
