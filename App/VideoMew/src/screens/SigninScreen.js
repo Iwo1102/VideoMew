@@ -20,13 +20,13 @@ export default function SigninScreen({navigation}) {
     const signinPressed = async () => {
         try {
             const res = await SigninHandler(username, password);
-            console.log("response:" + res.success)
+            console.log("response:", res); // Logging the entire response object for debugging
             if (res.success) {
-                setSucess(true)
-                setScreen('signout')
+                setSucess(true);
+                setScreen('signout');
             } else {
-                setSucess(false)
-                setMessage(res.message)
+                setSucess(false);
+                setMessage(res.message);
             }
         } catch (error) {
             console.error("Error during sign-in:", error.message);
@@ -92,7 +92,7 @@ export default function SigninScreen({navigation}) {
             {screen === 'signin' && (
                 <>
                     <Text style={styles.headerText}>Sign in here</Text>
-                    {!success && <Text style={styles.errorText}>{message}</Text>}
+                    {!success && <Text style={styles.errorText}>{ message }</Text>}
                     <CustomTextBox placeholder="Username" onChangeText={text => setUsername(text)} />
                     <CustomTextBox placeholder="Password" onChangeText={text => setPassword(text)} />
                     <CustomButton title="Submit" onPress={signinPressed} />
@@ -105,7 +105,7 @@ export default function SigninScreen({navigation}) {
                     <CustomTextBox placeholder="Username" onChangeText={text => setUsername(text)}/>
                     <CustomTextBox placeholder="Email" onChangeText={text => setEmail(text)}/>
                     <CustomTextBox placeholder="Password" onChangeText={text => setPassword(text)}/>
-                    <CustomTextBox placeholder="Confirm Password" onChangeText={text => setPassword(text)}/>
+                    <CustomTextBox placeholder="Confirm Password" onChangeText={text => setconfPassword(text)}/>
                     <CustomButton title="Submit" onPress={signupPressed} />
                 </>
             )}

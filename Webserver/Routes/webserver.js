@@ -10,7 +10,7 @@ mongoose.set('strictQuery', false);
 const Schema = mongoose.Schema
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/VidMew', {
+mongoose.connect('mongodb://localhost:27123/VidMew', {
 }).then(() => {
 	console.log('Connected to MongoDB');
 }).catch((error) => {
@@ -41,12 +41,12 @@ const GameSchema = new mongoose.Schema({
 const User = mongoose.model('Users', UserSchema);
 const Game = mongoose.model('Games', GameSchema);
 
-router.post('/signin', async (req, res, next) => {
+router.post('/signin', async (req, res) => {
     let checkPass = false
     let theUser = {}
     try {
       let user = await User.find({userName: {$eq: req.body.userName.trim()}})
-      if (user.length == 0) {
+      if (user.length != 0) {
         theUser.userName = user[0].userName
         theUser.password = user[0].pass
         theUser.userEmail = user[0].email
@@ -60,21 +60,21 @@ router.post('/signin', async (req, res, next) => {
           console.log(error.message);
     }
     if (!checkPass) {
-      res.send({ success: false, message: "Email or password incorrect", error: 1 })
+      res.json({ success: false, message: "Email or password incorrect", error: 1 })
       return
     }
     req.session.isLoggedIn = true
     req.session.theLoggedInUser = theUser.userName
     if (theUser.admin == true) {
       req.session.isAdmin = true
-      res.send({ success: true, message: "Welcome, Admin", error: 0 })
+      res.json({ success: true, message: "Welcome, Admin", error: 0 })
     } else {
       req.session.isAdmin = false
-      res.send({ success: true, message: "Welcome", error: 0 })
+      res.json({ success: true, message: "Welcome", error: 0 })
     }
   })
   
-  router.post('/signup', async (req, res, next) => {
+  router.post('/signup', async (req, res) => {
     try {
       let pass = req.body.pass.trim();
       let email = req.body.email.trim();
@@ -95,12 +95,12 @@ router.post('/signin', async (req, res, next) => {
             console.log("ID: " + userId)
             userId++;
           }
-            res.send({ success: true, message: "Signup successfull", error: 0 })
+            res.json({ success: true, message: "Signup successfull", error: 0 })
         } else {
-          res.send({ success: false, message: "User Name aready exists", error: 1 })
+          res.json({ success: false, message: "User Name aready exists", error: 1 })
         }
       } else {
-        res.send({ success: false, message: "Email aready used", error: 2 })
+        res.json({ success: false, message: "Email aready used", error: 2 })
       }
   
    } catch (error) {
@@ -109,11 +109,11 @@ router.post('/signin', async (req, res, next) => {
     }
   })
   
-  router.get('/signout', (req, res, next) => {
+  router.get('/signout', (req, res) => {
     req.session.isLoggedIn = false
     let loggedIn = req.session.isLoggedIn
     req.session.isAdmin = false
-    res.send('done: ' + loggedIn)
+    res.json({ success: true, message: "Signed out", error: 0 })
   })
 
   router.get('/getAllGames', async (req, res) => {
@@ -138,7 +138,7 @@ router.get('/searchGames', async (req, res) => {
 });
 
   
-  router.post('/reviewAdd', async (req, res, next) => {
+  router.post('/reviewAdd', async (req, res) => {
     if (req.session.isLoggedIn == true) {
       try {
         let userCaller = req.body.userName
@@ -175,17 +175,18 @@ router.get('/searchGames', async (req, res) => {
               res.send({ success: true, message: "Review Added", error: 0 })
             }
           } else {
-            res.send({ success: false, message: "Game not found", error: 3 })
+            res.json({ success: false, message: "Game not found", error: 3 })
           }
         } else {
-          res.send({ success: false, message: "User not found", error: 2 })
+          res.json({ success: false, message: "User not found", error: 2 })
         }
       } catch (error) {
         res.status(500).json({ error: error.message });
-          console.log(error.message);
+        console.log(error.message);
       }
     } else {
-      res.send({ success: false, message: "Not logged in", error: 1 })
+      res.json({ success: false, message: "Not logged in", error: 1 })
+
     }
   })
 

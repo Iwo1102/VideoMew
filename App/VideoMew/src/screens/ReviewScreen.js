@@ -3,6 +3,7 @@ import { View, Text, Image, TextInput, StyleSheet, TouchableOpacity, ScrollView 
 import CustomTextBox from '../components/textBox';
 import CustomSearchButton from '../components/customSearchButton';
 import axios from 'axios';
+import { requestData } from '../webserver/AsyncData';
 
 
 export default function ReviewScreen({ route }) {
@@ -16,7 +17,7 @@ export default function ReviewScreen({ route }) {
     console.log('Rating:', rating);
   
     try {
-      const response = await axios.post('http://192.168.1.100:3000/reviewAdd', {
+      const response = await axios.post('http://54.81.45.41:3000/reviewAdd', {
         userName: 'yourUserName',
         title: game.title,
         rating: rating,
