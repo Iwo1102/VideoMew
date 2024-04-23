@@ -4,36 +4,37 @@ import { requestData } from './AsyncData';
 import { storeData } from './AsyncData';
 
 
-async function SigninHandler(userName, password) {
+async function reviewAddHandler(gameTitle, gameRating, gameComment) {
     try {
         console.log("sign in handler")
-        let resp =  await fetch('http://54.81.45.41:3000/signin', {
+
+
+        let dataReq = await requestData("user")
+        if (dataReq == 500 ) {
+            error.meesage = "Cant store data";
+            throw error
+        }
+        const obj = JSON.parse(dataReq)
+        let resp =  await fetch('http://54.81.45.41:3000/reviewAdd', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                userName: userName,
-                pass: password
+                userName: obj.storedName,
+                pass: obj.storedPass,
+                title: gameTitle,
+                rating: gameRating,
+                comment: gameComment
             })
         });
-        let userObj = {
-            storedName: userName,
-            storedPass: password
-        }
-        let dataResp = await storeData("user", userObj)
-        if (dataResp == 500 ) {
-            error.meesage = "Cant store data";
-            throw error
-        }
-        console.log(dataReq)
         const data = await resp.json()
         return data
     } catch (error) {
         console.error("Error in SigninHandler:", error.message);
-		console.log(error.message);
+		console.log(error.message)
         return data
     }
 }
 
-export default SigninHandler;
+export default reviewAddHandler;

@@ -18,7 +18,7 @@ async function SigninHandler(userName, password, email) {
     } catch (error) {
         console.error("Error in SignupHandler:", error.message);
 		console.log(error.message);
-        return error;
+        return data;
     }
 }
 

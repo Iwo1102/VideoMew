@@ -4,6 +4,7 @@ import CustomTextBox from '../components/textBox';
 import CustomSearchButton from '../components/customSearchButton';
 import axios from 'axios';
 import { requestData } from '../webserver/AsyncData';
+import reviewAddHandler from '../webserver/RewiewAddHandler';
 
 
 export default function ReviewScreen({ route }) {
@@ -17,17 +18,11 @@ export default function ReviewScreen({ route }) {
     console.log('Rating:', rating);
   
     try {
-      const response = await axios.post('http://54.81.45.41:3000/reviewAdd', {
-        userName: 'yourUserName',
-        title: game.title,
-        rating: rating,
-        comment: comment
-      });
-  
-      if (response.data.success) {
+      const response = await reviewAddHandler(game.title, game.rating, game.comment)
+      if (response.success) {
         alert('Review submitted successfully!');
       } else {
-        alert('Failed to submit review: ' + response.data.message);
+        alert('Failed to submit review: ' + response.message);
       }
     } catch (error) {
       console.error('Error submitting review:', error);
