@@ -136,7 +136,6 @@ router.get('/searchGames', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
   
   router.post('/reviewAdd', async (req, res) => {
     if (req.session.isLoggedIn == true) {
