@@ -16,8 +16,9 @@ async function SigninHandler(userName, password, email) {
         const data = await resp.json()
         return data
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Error in SignupHandler:", error.message);
 		console.log(error.message);
+        return error;
     }
 }
 

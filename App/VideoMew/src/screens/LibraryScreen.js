@@ -32,6 +32,12 @@ return (
           <Image source={{ uri: game.image }} style={styles.image} />
           <Text>Developer: {game.developer}</Text>
           <Text>Genre: {game.genre.join(', ')}</Text>
+          {game.reviews && game.reviews.map((review, index) => (
+            <View key={index} style={styles.reviewText}>
+              <Text>Rating: {review.rating} Stars</Text>
+              <Text>Comment: {review.comment}</Text>
+            </View>
+          ))}
         </TouchableOpacity>
       ))}
     </ScrollView>
@@ -56,5 +62,12 @@ const styles = StyleSheet.create({
     width: 250,
     height: 250,
     resizeMode: 'cover'
+  },
+  reviewText: {
+    padding: 5,
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
+});
   }
 });

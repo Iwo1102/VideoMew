@@ -6,6 +6,7 @@ import CustomTextBox from '../components/textBox';
 import SigninHandler from '../webserver/SigninHandler';
 import SignupHandler from '../webserver/SignupHandler'
 import SignoutHander from '../webserver/SignoutHandler'
+import CustomButton from '../components/CustomButton';
 
 export default function SigninScreen({navigation}) {
     const [username, setUsername] = useState('')
@@ -19,13 +20,13 @@ export default function SigninScreen({navigation}) {
     const signinPressed = async () => {
         try {
             const res = await SigninHandler(username, password);
-            console.log("response:" + res.success)
+            console.log("response:", res); // Logging the entire response object for debugging
             if (res.success) {
-                setSucess(true)
-                setScreen('signout')
+                setSucess(true);
+                setScreen('signout');
             } else {
-                setSucess(false)
-                setMessage(res.message)
+                setSucess(false);
+                setMessage(res.message);
             }
         } catch (error) {
             console.error("Error during sign-in:", error.message);
@@ -72,51 +73,63 @@ export default function SigninScreen({navigation}) {
 
 
     return(
-        
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <View style={styles.container}> 
-                {screen != 'signout' && (
+            <View style={styles.container}>
+                {screen !== 'signout' && (
                     <>
-                        <Text> Not Signed up? </Text>
-                        <Button title="Sign up" onPress={() => setScreen('signup')}/>
-                        <Text> Else </Text>
-                        <Button title="Sign in" onPress={() => setScreen('signin')}/>
+                        <Text style={styles.infoText}>Not Signed up?</Text>
+                        <CustomButton title="Sign up" onPress={() => setScreen('signup')} />
+                        <Text style={styles.infoText}>Already Signed up?</Text>
+                        <CustomButton title="Sign in" onPress={() => setScreen('signin')} />
                     </>
                 )}
-                {screen == 'signout' && (
+                {screen === 'signout' && (
                     <>
-                        <Button title="Sign out" onPress={signoutPressed}/>
+                        <CustomButton title="Sign out" onPress={signoutPressed} />
                     </>
                 )}
-                
             </View>
-            {screen == 'signin' && (
+            {screen === 'signin' && (
                 <>
-                    <Text> SignIn </Text>
-                    {!success && <Text style={{ color: 'red' }}>{message}</Text>}
+                    <Text style={styles.headerText}>Sign in here</Text>
+                    {!success && <Text style={styles.errorText}>{ message }</Text>}
                     <CustomTextBox placeholder="Username" onChangeText={text => setUsername(text)} />
                     <CustomTextBox placeholder="Password" onChangeText={text => setPassword(text)} />
-                    <Button title="Submit" onPress={signinPressed} />
+                    <CustomButton title="Submit" onPress={signinPressed} />
                 </>
             )}
-            {screen == 'signup' && (
+            {screen === 'signup' && (
                 <>
-                    <Text> SignUp </Text>
-                    {success == false && <Text style={{ color: 'red' }}>{message} </Text>}
+                    <Text style={styles.headerText}>Sign up here</Text>
+                    {success === false && <Text style={styles.errorText}>{message}</Text>}
                     <CustomTextBox placeholder="Username" onChangeText={text => setUsername(text)}/>
                     <CustomTextBox placeholder="Email" onChangeText={text => setEmail(text)}/>
                     <CustomTextBox placeholder="Password" onChangeText={text => setPassword(text)}/>
                     <CustomTextBox placeholder="Confirm Password" onChangeText={text => setconfPassword(text)}/>
-                    <Button title="Submit" onPress={signupPressed} />
+                    <CustomButton title="Submit" onPress={signupPressed} />
                 </>
             )}
-            </View>
+        </View>
     );
 } 
 
 const styles = StyleSheet.create({
     container: {
-      padding: 20,
-      margin: 10,
+        padding: 20,
+        margin: 10,
+    },
+    headerText: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    infoText: {
+        fontSize: 16,
+        marginTop: 10,
+        marginBottom: 10,
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 16,
     }
 });

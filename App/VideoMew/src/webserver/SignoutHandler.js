@@ -1,22 +1,23 @@
-import * as React from 'react';
+import * as React from 'react'; 
+import { EraseData } from './AsyncData';
 
 async function SignoutHandler(userName, password,) {
     try {
+        console.log("user:" + userName + " " + password)
         let resp =  await fetch('http://54.81.45.41:3000/signout', {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                userName: userName,
-                pass: password
-            })
+            }
         });
+        EraseData("user")
+
         const data = await resp.json()
         return data
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Error in SignoutHandler:", error.message);
 		console.log(error.message);
+        return error;
     }
 }
 
