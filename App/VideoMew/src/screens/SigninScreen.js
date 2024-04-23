@@ -6,6 +6,7 @@ import CustomTextBox from '../components/textBox';
 import SigninHandler from '../webserver/SigninHandler';
 import SignupHandler from '../webserver/SignupHandler'
 import SignoutHander from '../webserver/SignoutHandler'
+import RootHandler from '../webserver/RootHandler';
 import CustomButton from '../components/CustomButton';
 
 export default function SigninScreen({navigation}) {
@@ -28,12 +29,14 @@ export default function SigninScreen({navigation}) {
                 setSucess(false);
                 setMessage(res.message);
             }
+            RootHandler()
         } catch (error) {
             console.error("Error during sign-in:", error.message);
         }
     };
 
     const signupPressed = async () => {
+        console.log("signupPressed")
         if (password != confPassword) {
             setSucess(false)
             setMessage("Passwords don't match")
@@ -49,7 +52,7 @@ export default function SigninScreen({navigation}) {
                 setMessage(res.message)
             }
         } catch (error) {
-            console.error("Error during sign-in:", error.message);
+            console.error("Error during sign-up:", error.message);
         }
     };
 
@@ -67,7 +70,7 @@ export default function SigninScreen({navigation}) {
                     setMessage(res.message)
                 }
         } catch (error) {
-            console.error("Error during sign-in:", error.message);
+            console.error("Error during sign-out:", error.message);
         }
     };
 

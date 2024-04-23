@@ -79,6 +79,7 @@ router.post('/signin', async (req, res) => {
   })
   
   router.post('/signup', async (req, res) => {
+    console.log("signup")
     try {
       let pass = req.body.pass.trim();
       let email = req.body.email.trim();
@@ -93,23 +94,28 @@ router.post('/signin', async (req, res) => {
             let checkID = await User.find({id: {$eq: userId}});
             if (checkID.length == 0) {
               let hashpass = bcrypt.hashSync(pass, 10);
+              console.log("create user")
               await User.create({userName: userName, email: req.body.email.trim(), pass: hashpass, id: userId, reviews: [], admin: false})
               flag = 1;
             }
-            console.log("ID: " + userId)
             userId++;
           }
+            req.session.isLoggedIn = true
+            req.session.theLoggedInUser = userName
+            console.log("Signup successfull")
             res.json({ success: true, message: "Signup successfull", error: 0 })
         } else {
+          console.log("User Name aready exists")
           res.json({ success: false, message: "User Name aready exists", error: 1 })
         }
       } else {
+        console.log("Email aready used")
         res.json({ success: false, message: "Email aready used", error: 2 })
       }
   
    } catch (error) {
       res.status(500).json({ error: error.message });
-          console.log(error.message);
+      console.log("error:" + error.message);
     }
   })
   
@@ -142,7 +148,8 @@ router.get('/searchGames', async (req, res) => {
 });
   
   router.post('/reviewAdd', async (req, res) => {
-    if (req.session.isLoggedIn == true) {
+    console.log("session: " + req.session.theLoggedInUser + "Request: " + req.body.userName)
+    if (req.session.theLoggedInUser == req.body.userName) {
       try {
         let userCaller = req.body.userName
         let gameTitle = req.body.title

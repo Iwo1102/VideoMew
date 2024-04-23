@@ -6,7 +6,7 @@ import { storeData } from './AsyncData';
 
 async function SigninHandler(userName, password) {
     try {
-        console.log("sign in handler")
+
         let resp =  await fetch('http://54.81.45.41:3000/signin', {
             method: 'POST',
             headers: {
@@ -21,18 +21,14 @@ async function SigninHandler(userName, password) {
             storedName: userName,
             storedPass: password
         }
-        let dataResp = await storeData("user", userObj)
-        if (dataResp == 500 ) {
-            error.meesage = "Cant store data";
-            throw error
-        }
-        console.log(dataReq)
+        storeData("user", userObj)
+
         const data = await resp.json()
         return data
     } catch (error) {
         console.error("Error in SigninHandler:", error.message);
 		console.log(error.message);
-        return data
+        return error
     }
 }
 

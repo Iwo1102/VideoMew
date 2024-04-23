@@ -12,13 +12,19 @@ export default function ReviewScreen({ route }) {
 
   const [comment, setComment] = useState('');
   const [rating, setRating] = useState('');
+  const [tempRating, setTempRating] = useState('');
 
   const submitReview = async () => {
     console.log('Comment:', comment);
     console.log('Rating:', rating);
   
     try {
-      const response = await reviewAddHandler(game.title, game.rating, game.comment)
+      if (rating > 5 ) {
+        setRating(5)
+      } else {
+        setRating(rating)
+      }
+      const response = await reviewAddHandler(game.title, rating, comment)
       if (response.success) {
         alert('Review submitted successfully!');
       } else {
