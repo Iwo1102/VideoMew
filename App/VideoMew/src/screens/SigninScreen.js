@@ -51,6 +51,7 @@ export default function SigninScreen({navigation}) {
                 setSucess(false)
                 setMessage(res.message)
             }
+            RootHandler()
         } catch (error) {
             console.error("Error during sign-up:", error.message);
         }
