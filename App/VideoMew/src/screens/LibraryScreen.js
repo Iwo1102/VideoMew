@@ -21,7 +21,7 @@ export default function LibraryScreen({ navigation }) {
         console.error('Failed to fetch games', error);
         alert('Failed to fetch games: ' + error.message);
     }
-};
+  };
 
 
 return (

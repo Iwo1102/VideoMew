@@ -13,11 +13,12 @@ async function SignoutHandler(userName, password,) {
         EraseData("user")
 
         const data = await resp.json()
+        console.log(data)
         return data
     } catch (error) {
         console.error("Error in SignoutHandler:", error.message);
 		console.log(error.message);
-        return data;
+        return error;
     }
 }
 
