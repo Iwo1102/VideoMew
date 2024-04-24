@@ -4,6 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import SearchHandler from '../webserver/SearchHander';
 
+
+
+
 export default function SearchScreen({ navigation }) {
   const [games, setGames] = useState([]);
   const [query, setQuery] = useState('');
@@ -33,6 +36,7 @@ export default function SearchScreen({ navigation }) {
       <View style={{ flexDirection: 'row' }}>
       <CustomTextBox placeholder="Search" onChangeText={text => setQuery(text)} value={query} />
       <CustomSearchButton onPress={SearchPressed} />
+
     </View>
     <ScrollView contentContainerStyle={styles.container}>
     {games.map(game => (
