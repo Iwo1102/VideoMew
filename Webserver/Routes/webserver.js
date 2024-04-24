@@ -41,24 +41,20 @@ const GameSchema = new mongoose.Schema({
 const User = mongoose.model('Users', UserSchema);
 const Game = mongoose.model('Games', GameSchema);
 
-router.post('/signin', async (req, res) => {
+router.post('/signin', async (req, res, next) => {
     let checkPass = false
     let theUser = {}
     try {
-      let user = await User.findOne({userName: {$eq: req.body.userName.trim()}})
-      if (user) {
-        theUser.userName = user.userName
-        theUser.password = user.pass
-        theUser.userEmail = user.email
-        theUser.id = user.id
-        theUser.admin = user.admin
-
-        checkPass = await bcrypt.compare(req.body.pass.trim(), user.pass)
-      } else {
-        res.json({ success: false,  message: "User not found ", error: 2 });
-        return;
+      let user = await User.find({userName: {$eq: req.body.userName.trim()}})
+      if (user.length == 0) {
+        theUser.userName = user[0].userName
+        theUser.password = user[0].pass
+        theUser.userEmail = user[0].email
+        theUser.id = user[0].id
+        theUser.admin = user[0].admin
       }
     
+      checkPass = await bcrypt.compare(req.body.pass.trim(), user[0].pass)
     } catch (error) {
       res.status(500).json({ error: error.message });
           console.log(error.message);
@@ -78,8 +74,7 @@ router.post('/signin', async (req, res) => {
     }
   })
   
-  router.post('/signup', async (req, res) => {
-    console.log("signup")
+  router.post('/signup', async (req, res, next) => {
     try {
       let pass = req.body.pass.trim();
       let email = req.body.email.trim();
@@ -94,32 +89,27 @@ router.post('/signin', async (req, res) => {
             let checkID = await User.find({id: {$eq: userId}});
             if (checkID.length == 0) {
               let hashpass = bcrypt.hashSync(pass, 10);
-              console.log("create user")
               await User.create({userName: userName, email: req.body.email.trim(), pass: hashpass, id: userId, reviews: [], admin: false})
               flag = 1;
             }
+            console.log("ID: " + userId)
             userId++;
           }
-            req.session.isLoggedIn = true
-            req.session.theLoggedInUser = userName
-            console.log("Signup successfull")
             res.json({ success: true, message: "Signup successfull", error: 0 })
         } else {
-          console.log("User Name aready exists")
           res.json({ success: false, message: "User Name aready exists", error: 1 })
         }
       } else {
-        console.log("Email aready used")
         res.json({ success: false, message: "Email aready used", error: 2 })
       }
   
    } catch (error) {
       res.status(500).json({ error: error.message });
-      console.log("error:" + error.message);
+          console.log(error.message);
     }
   })
   
-  router.get('/signout', (req, res) => {
+  router.get('/signout', (req, res, next) => {
     req.session.isLoggedIn = false
     let loggedIn = req.session.isLoggedIn
     req.session.isAdmin = false
@@ -128,28 +118,18 @@ router.post('/signin', async (req, res) => {
 
   router.get('/getAllGames', async (req, res) => {
     try {
-        const games = await Game.find().populate('reviews'); // Assuming reviews are a subdocument or referenced document
-        res.json(games);
+        const games = await Game.find();  // Assuming 'Game' is your Mongoose model
+        res.json(games);  // Sends the games as JSON
+        console.log("Games fetched");
     } catch (error) {
-        console.error("Error fetching games:", error);
         res.status(500).json({ error: 'Internal Server Error' });
+        console.error("Error fetching games:", error);
     }
 });
 
-router.get('/searchGames', async (req, res) => {
-  try {
-      const query = req.query.q; // Assume "q" is the query parameter
-      const games = await Game.find({ title: { $regex: query, $options: 'i' }}).populate('reviews');
-      res.json(games);
-  } catch (error) {
-      console.error("Error searching games:", error);
-      res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
   
-  router.post('/reviewAdd', async (req, res) => {
-    console.log("session: " + req.session.theLoggedInUser + "Request: " + req.body.userName)
-    if (req.session.theLoggedInUser == req.body.userName) {
+  router.post('/reviewAdd', async (req, res, next) => {
+    if (req.session.isLoggedIn == true) {
       try {
         let userCaller = req.body.userName
         let gameTitle = req.body.title
@@ -157,19 +137,19 @@ router.get('/searchGames', async (req, res) => {
         let gameComment = req.body.comment
 
 
-        let user = await User.findOne({userName: userCaller});
-        if (user) {
-          let game = await Game.findOne({title: gameTitle});
+        let user = await User.findOne({userName: {$eq: userCaller}});
+        if (user.length != 0) {
+          let game = await Game.findOne({title:{$eq: gameTitle}});
           let errFlag = 0;
-          if (game) {
+          if (game.length != 0) {
             for (let i = 0; i < game.reviews.length; i++) {
               if (game.reviews[i].userId == user.id) {
-                errFlag = true;
+                errFlag = 1;
               } 
             }
             console.log("review count " + game.reviews.length)
-            if (errFlag) {
-              res.send({ success: false, message: "User already reviewed this game ", error: 4 })
+            if (errFlag == 1) {
+              res.json({ success: false, message: "User already reviewed this game", error: 4 })
             } else {
               // reviews: [{UserId: Number, rating: Number, comment: String}]
               let avg = 0;
@@ -182,21 +162,20 @@ router.get('/searchGames', async (req, res) => {
               await Game.findOneAndUpdate({title: {$eq: gameTitle}}, {$push: {reviews: {userId: user.id, rating: gameRating, comment: gameComment}}, avgRating: avg});
               // reviews: [{gameId: Number, rating: Number}]
               await User.findOneAndUpdate({userName: {$eq: userCaller}}, {$push: {reviews: {gameId: game.id, rating: gameRating}}});
-              res.send({ success: true, message: "Review Added ", error: 0 })
+              res.json({ success: true, message: "Review Added", error: 0 })
             }
           } else {
-            res.json({ success: false, message: "Game not found ", error: 3 })
+            res.json({ success: false, message: "Game not found", error: 3 })
           }
         } else {
-          res.json({ success: false, message: "User not found ", error: 2 })
+          res.json({ success: false, message: "User not found", error: 2 })
         }
       } catch (error) {
         res.status(500).json({ error: error.message });
-        console.log(error.message);
+          console.log(error.message);
       }
     } else {
-      res.json({ success: false, message: "Not logged in ", error: 1 })
-
+      res.json({ success: false, message: "Not logged in", error: 1 })
     }
   })
 

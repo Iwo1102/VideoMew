@@ -10,7 +10,7 @@ async function reviewAddHandler(gameTitle, gameRating, gameComment) {
         if (dataReq != null ) {
             const obj = JSON.parse(dataReq)
             let resp =  await fetch('http://54.81.45.41:3000/reviewAdd', {
-                method: 'POST',
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
                 },
