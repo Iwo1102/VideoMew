@@ -110,7 +110,7 @@ export default function SigninScreen({navigation}) {
                     <CustomTextBox placeholder="Email" onChangeText={text => setEmail(text)}/>
                     <CustomTextBox placeholder="Password" onChangeText={text => setPassword(text)}/>
                     <CustomTextBox placeholder="Confirm Password" onChangeText={text => setconfPassword(text)}/>
-                    <CustomButton title="Submit" onPress={signupPressed} />
+                    <CustomButton title="Create Account" onPress={signupPressed} />
                 </>
             )}
         </View>
